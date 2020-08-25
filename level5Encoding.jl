@@ -387,7 +387,7 @@ end
 @variable(m, fair)
 @constraint(m, fair == sum(fairVar[t] for t = 1:NL) / NL)
 
-@objective(m, Min, sumLt - fair)
+@objective(m, Min, sumLt + sumDt - fair)
 
 #@objective(m, Max, fair)
 

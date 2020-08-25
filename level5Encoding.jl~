@@ -290,7 +290,7 @@ end
 dataID = "4"
 dataPath = "/Users/bobobo/Documents/fairSyn/juliaCode/readData/"
 
-Dataset = CSV.read(joinpath(Pkg.dir("DataFrames"), $dataPath*"test$dataID.csv"))
+Dataset = CSV.read(joinpath(Pkg.dir("DataFrames"), dataPath*"test$dataID.csv"))
 # Data matrix without Dataset
 mt = convert(Matrix, Dataset[:,1:NF])
 # Data matrix with output

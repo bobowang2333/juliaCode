@@ -5,7 +5,7 @@ using DataFrames, CSV
 m = Model(solver = GurobiSolver(NonConvex=2))
 
 # set macro, the size of outputClass, input features, .. etc.
-NE = 10; # number of examples
+NE = 2; # number of examples
 NF = 5; # number of input features
 NO = 2; # number of output features
 
@@ -161,7 +161,7 @@ for i = 1:(2^nlevel-1)
 end
 
 #read the input data from CSV file
-dataID = "0"
+dataID = "15"
 dataPath = "/Users/bobobo/Documents/fairSyn/juliaCode/testData/"
 Dataset = CSV.read(joinpath(Pkg.dir("DataFrames"), dataPath*"test$dataID.csv"))
 # Data matrix without Dataset
@@ -243,7 +243,7 @@ end
 @variable(m, fair)
 @constraint(m, fair == sum(fairVar[t] for t = 1:NL) / NL)
 
-@objective(m, Min, sumLt - fair)
+@objective(m, Min, sumLt + 0.2 * sumDt - fair)
 solve(m)
 
 io = open(dataPath*"res.txt", "w")

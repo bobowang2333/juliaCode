@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CFAF429A24F09751003793A2"
-               BuildableName = "genJulia"
-               BlueprintName = "genJulia"
-               ReferencedContainer = "container:genJulia.xcodeproj">
+               BlueprintIdentifier = "CFAF42C024F49B82003793A2"
+               BuildableName = "runResult"
+               BlueprintName = "runResult"
+               ReferencedContainer = "container:runResult.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "CFAF429A24F09751003793A2"
-            BuildableName = "genJulia"
-            BlueprintName = "genJulia"
-            ReferencedContainer = "container:genJulia.xcodeproj">
+            BlueprintIdentifier = "CFAF42C024F49B82003793A2"
+            BuildableName = "runResult"
+            BlueprintName = "runResult"
+            ReferencedContainer = "container:runResult.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -55,20 +55,16 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "CFAF429A24F09751003793A2"
-            BuildableName = "genJulia"
-            BlueprintName = "genJulia"
-            ReferencedContainer = "container:genJulia.xcodeproj">
+            BlueprintIdentifier = "CFAF42C024F49B82003793A2"
+            BuildableName = "runResult"
+            BlueprintName = "runResult"
+            ReferencedContainer = "container:runResult.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "0  /Users/bobobo/Documents/fairSyn/juliaCode/testData/ 10"
+            argument = "/Users/bobobo/Documents/fairSyn/juliaCode/testData/treeRes.txt /Users/bobobo/Documents/fairSyn/juliaCode/testData/test1.csv"
             isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "/Users/bobobo/Documents/fairSyn/juliaCode/testData/"
-            isEnabled = "NO">
          </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
@@ -84,10 +80,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "CFAF429A24F09751003793A2"
-            BuildableName = "genJulia"
-            BlueprintName = "genJulia"
-            ReferencedContainer = "container:genJulia.xcodeproj">
+            BlueprintIdentifier = "CFAF42C024F49B82003793A2"
+            BuildableName = "runResult"
+            BlueprintName = "runResult"
+            ReferencedContainer = "container:runResult.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

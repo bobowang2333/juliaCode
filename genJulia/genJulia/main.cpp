@@ -19,7 +19,7 @@
 using namespace std;
 
 // path = "/Users/bobobo/Documents/fairSyn/juliaCode/"
-void writeJulia(string ID, string path)
+void writeJulia(string ID, string path, string ExpNum)
 {
     ofstream juliaFile;
     juliaFile.open(path+"level.jl");
@@ -28,7 +28,7 @@ void writeJulia(string ID, string path)
     juliaFile << "m = Model(solver = GurobiSolver(NonConvex=2))\n";
     juliaFile << "\n";
     juliaFile << "# set macro, the size of outputClass, input features, .. etc.\n";
-    juliaFile << "NE = 10; # number of examples\n";
+    juliaFile << "NE = " + ExpNum + "; # number of examples\n";
     juliaFile << "NF = 5; # number of input features\n";
     juliaFile << "NO = 2; # number of output features\n";
     juliaFile << "\n";
@@ -186,6 +186,7 @@ void writeJulia(string ID, string path)
     juliaFile << "#read the input data from CSV file\n";
     juliaFile << "dataID = \"" + ID + "\"\n";
     juliaFile << "dataPath = \"" + path + "\"\n";
+    // bobo : assume that the CSV file starts with prefix "test"
     juliaFile << "Dataset = CSV.read(joinpath(Pkg.dir(\"DataFrames\"), dataPath*\"test$dataID.csv\"))\n";
     juliaFile << "# Data matrix without Dataset\n";
     juliaFile << "mt = convert(Matrix, Dataset[:,1:NF])\n";
@@ -266,7 +267,7 @@ void writeJulia(string ID, string path)
     juliaFile << "@variable(m, fair)\n";
     juliaFile << "@constraint(m, fair == sum(fairVar[t] for t = 1:NL) / NL)\n";
     juliaFile << "\n";
-    juliaFile << "@objective(m, Min, sumLt - fair)\n";
+    juliaFile << "@objective(m, Min, sumLt + 0.2 * sumDt - fair)\n";
     juliaFile << "solve(m)\n";
     juliaFile << "\n";
     juliaFile << "io = open(dataPath*\"res.txt\", \"w\")\n";
@@ -297,8 +298,12 @@ void writeJulia(string ID, string path)
 int main(int argc, const char * argv[]) {
     cout << "Have " << argc << " arguments:" << endl;
     //int dataID = atoi(argv[1]);
-    string dataPath = "/Users/bobobo/Documents/fairSyn/juliaCode/testData/";
-    writeJulia(argv[1], dataPath);
+    //string dataPath = "/Users/bobobo/Documents/fairSyn/juliaCode/testData/";
+    string dataPath = argv[2];
+    // argv[1]: the ID of CSV file, "1", "2", or "3" => "test0.csv"
+    // argv[2]: the file path where the generated julia file will be stored
+    // argv[3]: the number of examples in the csv file
+    writeJulia(argv[1], dataPath, argv[3]);
     //dataPath = dataPath + argv[1];
     //dataPath += ".csv";
     cout << dataPath << endl;

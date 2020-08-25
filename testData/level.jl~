@@ -148,9 +148,6 @@ for i = 1:numNeed
 	levelDep[i,2] = @constraint(m, dt[i] >= dt[2*i+1])
 end
 
-@constraint(m, dt[2] == 1)
-@constraint(m, dt[3] == 1)
-
 @variable(m, sumDt)
 @constraint(m, sumDt == sum(dt[i] for i = 1:NB))
 
@@ -164,7 +161,7 @@ for i = 1:(2^nlevel-1)
 end
 
 #read the input data from CSV file
-dataID = "0"
+dataID = "1"
 dataPath = "/Users/bobobo/Documents/fairSyn/juliaCode/testData/"
 Dataset = CSV.read(joinpath(Pkg.dir("DataFrames"), dataPath*"test$dataID.csv"))
 # Data matrix without Dataset
@@ -246,7 +243,7 @@ end
 @variable(m, fair)
 @constraint(m, fair == sum(fairVar[t] for t = 1:NL) / NL)
 
-@objective(m, Min, sumLt - fair)
+@objective(m, Min, sumLt + sumDt - fair)
 solve(m)
 
 io = open(dataPath*"res.txt", "w")
