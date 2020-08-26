@@ -63,7 +63,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/bobobo/Documents/fairSyn/juliaCode/testData/treeRes.txt /Users/bobobo/Documents/fairSyn/juliaCode/testData/test1.csv"
+            argument = "/Users/bobobo/Documents/fairSyn/juliaCode/testData/treeRes.txt /Users/bobobo/Documents/fairSyn/juliaCode/testData/test1.csv 1 fair"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

@@ -7,6 +7,7 @@
 //
 
 #include <string>
+#include <tuple>
 #include <vector>
 #include <map>
 #include <set>
@@ -15,6 +16,7 @@
 #include <iostream>
 #include <cstdlib>
 using namespace std;
+typedef tuple<int, int, int, int> sensitiveInfo;
 
 void readFile(string filePath, map<int, int> &branch2Feature)
 {
@@ -36,8 +38,15 @@ void genDataTable(string dataPath, vector<vector<int>> &dataTable)
     string eachLine;
     ifstream dataFile;
     dataFile.open(dataPath);
+    int cnt = 1;
     while (getline(dataFile, eachLine)) {
         cout << eachLine << endl;
+        if (cnt == 1)
+        {
+            // avoid the dataTable takes the header as one line
+            cnt += 1;
+            continue;
+        }
         vector<int> tokens;
         stringstream ss(eachLine);
         for (int i; ss >> i; ) {
@@ -76,7 +85,7 @@ void gatherLeaves(map<int, int> &branch2Feature, vector<int> &leaves)
         {
             leaves.push_back((it->first)*2+1);
         }
-            
+        
     }
 }
 
@@ -93,7 +102,7 @@ void runClass(vector<vector<int>> &dataTable, map<int, int> &branch2Feature, vec
     for (vector<vector<int>>::iterator vvit = dataTable.begin(); vvit != dataTable.end(); ++vvit) {
         int branchNow = 1;
         while (branch2Feature.find(branchNow) != branch2Feature.end()) {
-            if(*vvit[branch2Feature[branchNow]] == 0)
+            if((*vvit)[(branch2Feature.find(branchNow))->second] == 0)
             {
                 // left branch
                 branchNow = branchNow*2;
@@ -112,11 +121,14 @@ void runClass(vector<vector<int>> &dataTable, map<int, int> &branch2Feature, vec
     for(map<int, int>::iterator it = index2leave.begin(); it != index2leave.end(); it++)
     {
         int res = leaveCount[it->second];
-        leaveClass.insert(pair<int, int>(it->first, res));
+        if(res >= 0)
+            leaveClass.insert(pair<int, int>(it->first, 1));
+        else
+            leaveClass.insert(pair<int, int>(it->first, 0));
     }
 }
 
-int calError(map<int, int> &branch2Feature, map<int, int> &leaveClass, vector<vector<int>> &dataTable, vector<int> &Loss)
+int calError(map<int, int> &branch2Feature, vector<int> &leaves, map<int, int> &leaveClass, vector<vector<int>> &dataTable, vector<int> &Loss)
 {
     map<int, int> index2leave;
     int cnt = 1;
@@ -128,7 +140,7 @@ int calError(map<int, int> &branch2Feature, map<int, int> &leaveClass, vector<ve
     for (vector<vector<int>>::iterator vvit = dataTable.begin(); vvit != dataTable.end(); ++vvit){
         int branchNow = 1;
         while (branch2Feature.find(branchNow) != branch2Feature.end()) {
-            if(*vvit[branch2Feature[branchNow]] == 0)
+            if((*vvit)[(branch2Feature.find(branchNow))->second] == 0)
             {
                 // left branch
                 branchNow = branchNow*2;
@@ -144,25 +156,119 @@ int calError(map<int, int> &branch2Feature, map<int, int> &leaveClass, vector<ve
     // print error for each leave node
     int sumErr = 0;
     for (map<int, int>::iterator it = index2leave.begin(); it != index2leave.end(); it++) {
-        cout << "leave node [" << it->first << "], error is " << Loss[it->second];
+        cout << "leave node [" << it->first << "], error is " << Loss[it->second] << endl;
         sumErr += Loss[it->second];
     }
     return sumErr;
 }
 
+void calLeaf2Percentage(vector<vector<int>> &dataTable, map<int, int> &branch2Feature, map<int, int> &leaveClass, map<int, sensitiveInfo> &leaf2Percentage, int senID)
+{
+    map<int, int> leaf2index;
+    
+    int count = 0;
+    for (map<int, int>::iterator it = leaveClass.begin(); it != leaveClass.end(); it++) {
+        leaf2index.insert(pair<int,int>(it->first, count));
+        count++;
+    }
+    
+    vector<vector<int>> leaf2Examples;
+    // initialize the leaf2Examples vector
+    int numLeaves = leaveClass.size();
+    for (int i = 0; i < numLeaves; ++i) {
+        vector<int> emptyVec;
+        leaf2Examples.push_back(emptyVec);
+    }
+    
+    // In dataTable, the first data row starts from 0
+    int cnt = 0;
+    for (vector<vector<int>>::iterator vvit = dataTable.begin(); vvit != dataTable.end(); ++vvit){
+        int branchNow = 1;
+        while (branch2Feature.find(branchNow) != branch2Feature.end()) {
+            if((*vvit)[(branch2Feature.find(branchNow))->second] == 0)
+            {
+                // left branch
+                branchNow = branchNow*2;
+            }else{
+                // right branch
+                branchNow = branchNow*2+1;
+            }
+        }
+        vector<int> tmp = leaf2Examples[leaf2index[branchNow]];
+        tmp.push_back(cnt);
+        leaf2Examples[leaf2index[branchNow]] = tmp;
+        cnt += 1;
+    }
+    
+     int classID = (dataTable[1]).size() - 1;
+     for(map<int, int>::iterator it = leaveClass.begin(); it != leaveClass.end(); it++)
+     {
+     vector<int> expTmp;
+     expTmp = leaf2Examples[leaf2index[it->first]];
+     int fpSum = 0, fSum = 0, mpSum = 0, mSum = 0;
+     for(vector<int>::iterator eit = expTmp.begin(); eit != expTmp.end(); ++eit)
+     {
+     // senID represents the sensitive feature ID, e.g. 0
+     if(dataTable[*eit][senID] == 0){
+         fSum += 1;
+     if(dataTable[*eit][classID] == 1)
+         fpSum +=1;
+     }else{
+         mSum += 1;
+     if(dataTable[*eit][classID] == 1)
+         mpSum += 1;
+     }
+     }
+     leaf2Percentage.insert(pair<int, sensitiveInfo>(it->first, make_tuple(fpSum, fSum, mpSum, mSum)));
+     }
+    
+}
+
+double calFair(map<int, sensitiveInfo> &leaf2Percentage, map<int, double> &fairVec)
+{
+    double sumFair = 0;
+    for(map<int, sensitiveInfo>::iterator it = leaf2Percentage.begin(); it != leaf2Percentage.end(); it++)
+    {
+        double tmp;
+        tmp = 1.0 * (get<0>(it->second)) * (get<3>(it->second)) - 0.8 * (get<2>(it->second)) * (get<1>(it->second));
+        fairVec.insert(pair<int, double>(it->first, tmp));
+        cout << "leave node [" << it->first << "], fair value is " << tmp << endl;
+        sumFair += tmp;
+    }
+    return sumFair;
+}
+
 int main(int argc, const char * argv[]) {
     // argv[1] : the file path of the encoding result
     // argv[2] : the dataset represented in the CSV file
+    // argv[3] : 0: cal error; 1: cal fairness value;
+    // argv[4] : senID
     map<int, int> branch2Feature;
     readFile(argv[1], branch2Feature);
     vector<vector<int>> dataTable;
     genDataTable(argv[2], dataTable);
     vector<int> leaves;
+    
     gatherLeaves(branch2Feature, leaves);
     //printDataTable(dataTable);
     map<int, int> leaveClass;
     runClass(dataTable, branch2Feature, leaves, leaveClass);
-    vector<int> Loss;
-    int error = calError(branch2Feature, leaveClass, dataTable, Loss);
+    
+    
+    
+    if(!strcmp(argv[3], "0")){
+        // Cal Error
+        vector<int> Loss;
+        int error = calError(branch2Feature, leaves, leaveClass, dataTable, Loss);
+    }else{
+        // Cal fairness
+        // Map: leaf ID => set of information (e.g. the percentage of sensitive features)
+        int senID = atoi(argv[4]);
+        map<int, sensitiveInfo> leaf2Percentage;
+        calLeaf2Percentage(dataTable, branch2Feature, leaveClass, leaf2Percentage, senID);
+        map<int, double> fairVec;
+        double fair = calFair(leaf2Percentage, fairVec);
+    }
+    
     return 0;
 }
