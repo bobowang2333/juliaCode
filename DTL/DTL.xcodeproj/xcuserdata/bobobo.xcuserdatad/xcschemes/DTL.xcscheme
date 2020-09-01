@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CFAF42C024F49B82003793A2"
-               BuildableName = "runResult"
-               BlueprintName = "runResult"
-               ReferencedContainer = "container:runResult.xcodeproj">
+               BlueprintIdentifier = "CFAF42D324FDD564003793A2"
+               BuildableName = "DTL"
+               BlueprintName = "DTL"
+               ReferencedContainer = "container:DTL.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "CFAF42C024F49B82003793A2"
-            BuildableName = "runResult"
-            BlueprintName = "runResult"
-            ReferencedContainer = "container:runResult.xcodeproj">
+            BlueprintIdentifier = "CFAF42D324FDD564003793A2"
+            BuildableName = "DTL"
+            BlueprintName = "DTL"
+            ReferencedContainer = "container:DTL.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <AdditionalOptions>
@@ -55,15 +55,15 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "CFAF42C024F49B82003793A2"
-            BuildableName = "runResult"
-            BlueprintName = "runResult"
-            ReferencedContainer = "container:runResult.xcodeproj">
+            BlueprintIdentifier = "CFAF42D324FDD564003793A2"
+            BuildableName = "DTL"
+            BlueprintName = "DTL"
+            ReferencedContainer = "container:DTL.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "/Users/bobobo/Documents/fairSyn/juliaCode/testData/treeRes.txt /Users/bobobo/Documents/fairSyn/juliaCode/testData/test1.csv 1 0"
+            argument = "/Users/bobobo/Documents/fairSyn/juliaCode/testData/test1.csv"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>
@@ -80,10 +80,10 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "CFAF42C024F49B82003793A2"
-            BuildableName = "runResult"
-            BlueprintName = "runResult"
-            ReferencedContainer = "container:runResult.xcodeproj">
+            BlueprintIdentifier = "CFAF42D324FDD564003793A2"
+            BuildableName = "DTL"
+            BlueprintName = "DTL"
+            ReferencedContainer = "container:DTL.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

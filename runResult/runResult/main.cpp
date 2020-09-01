@@ -128,10 +128,18 @@ void runClass(vector<vector<int>> &dataTable, map<int, int> &branch2Feature, vec
     }
 }
 
+void printClass(map<int, int> &leaveClass)
+{
+    for(map<int, int>::iterator it = leaveClass.begin(); it != leaveClass.end(); it++)
+    {
+        cout << "leave ID [" << it->first << "], output class [" << it->second << "]" << endl;
+    }
+}
+
 int calError(map<int, int> &branch2Feature, vector<int> &leaves, map<int, int> &leaveClass, vector<vector<int>> &dataTable, vector<int> &Loss)
 {
     map<int, int> index2leave;
-    int cnt = 1;
+    int cnt = 0;
     for(vector<int>::iterator it = leaves.begin(); it != leaves.end(); it++){
         index2leave.insert(pair<int, int>(*it, cnt));
         cnt++;
@@ -253,7 +261,7 @@ int main(int argc, const char * argv[]) {
     //printDataTable(dataTable);
     map<int, int> leaveClass;
     runClass(dataTable, branch2Feature, leaves, leaveClass);
-    
+    printClass(leaveClass);
     
     
     if(!strcmp(argv[3], "0")){
