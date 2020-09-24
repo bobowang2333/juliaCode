@@ -267,7 +267,8 @@ void writeJulia(string ID, string path, string ExpNum)
     juliaFile << "@variable(m, fair)\n";
     juliaFile << "@constraint(m, fair == sum(fairVar[t] for t = 1:NL))\n";
     juliaFile << "\n";
-    juliaFile << "@objective(m, Min, sumLt + 0.2 * sumDt - fair)\n";
+    //juliaFile << "@objective(m, Min, sumLt + 0.2 * sumDt - fair)\n";
+    juliaFile << "@objective(m, Min, sumLt + 0.2 * sumDt)\n";
     juliaFile << "solve(m)\n";
     juliaFile << "\n";
     juliaFile << "io = open(dataPath*\"res.txt\", \"w\")\n";

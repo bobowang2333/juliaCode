@@ -139,12 +139,17 @@ void printClass(map<int, int> &leaveClass)
 int calError(map<int, int> &branch2Feature, vector<int> &leaves, map<int, int> &leaveClass, vector<vector<int>> &dataTable, vector<int> &Loss)
 {
     map<int, int> index2leave;
+    vector<vector<int>> leave2Example;
     int cnt = 0;
     for(vector<int>::iterator it = leaves.begin(); it != leaves.end(); it++){
         index2leave.insert(pair<int, int>(*it, cnt));
         cnt++;
         Loss.push_back(0);
+        
+        vector<int> emptyVec;
+        leave2Example.push_back(emptyVec);
     }
+    int exampleID = 1;
     for (vector<vector<int>>::iterator vvit = dataTable.begin(); vvit != dataTable.end(); ++vvit){
         int branchNow = 1;
         while (branch2Feature.find(branchNow) != branch2Feature.end()) {
@@ -160,12 +165,27 @@ int calError(map<int, int> &branch2Feature, vector<int> &leaves, map<int, int> &
         int len = (*vvit).size();
         if((*vvit)[len-1] != leaveClass[branchNow])
             Loss[index2leave[branchNow]] += 1;
+        
+        // add the structure associate the leaves with the set of examples
+        leave2Example[index2leave[branchNow]].push_back(exampleID);
+        exampleID++;
     }
     // print error for each leave node
     int sumErr = 0;
     for (map<int, int>::iterator it = index2leave.begin(); it != index2leave.end(); it++) {
         cout << "leave node [" << it->first << "], error is " << Loss[it->second] << endl;
         sumErr += Loss[it->second];
+    }
+    
+    // print leaves and the associated examples
+    cnt = 0;
+    for(vector<int>::iterator it = leaves.begin(); it != leaves.end(); it++){
+        cout << "leave ID [" << *it << "] -> Examples [";
+        for(vector<int>::iterator lit = leave2Example[index2leave[*it]].begin(); lit != leave2Example[index2leave[*it]].end(); lit++)
+        {
+            cout << *lit << " ";
+        }
+        cout << "]" << endl;
     }
     return sumErr;
 }

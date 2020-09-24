@@ -53,6 +53,32 @@ NB = (2^nlevel)-1; # number of branches
 @variable(m, sumLt, Int)
 @constraint(m, 0 <= sumLt)
 @constraint(m, sumLt == sum(Lt[i] for i = 1:NL))
+
+# define the Loss by entropy (or Gini Impurity)
+#=
+@variable(m, sumEt)
+@constraint(m, 0 <= sumEt)
+
+@variable(m, 0 <= Et[1:NL] <= 1)
+@constraint(m, consEt[i=1:NL], Et[i] == sum(Nkt[i,j]*(Nt[i] - Nkt[i,j]) for j = 1:NO)/NE)
+@constraint(m, sumEt == sum(Et[i] for i = 1:NL))
+
+@variable(m, outClass[1:NO, 1:NE])
+# calculate the entropy without any splitting
+for i = 1:NO
+    for j = 1:NE
+        if output[j] == i
+            outClass[i,j] == 1
+        else
+            outClass[i,j] == 0
+        end
+    end
+end
+
+@variable(m, outSum[1:NO])
+@constraint(m, consOut[i=1:NO], outSum[i] == sum(outClass[i,j] for j = 1:NE))
+=#
+
 # check the constraints
 #for i = 1:2
 #    for j = 1:NO
@@ -92,8 +118,8 @@ for i = 1:NB
     sensitiveFeature[i] = @constraint(m, Am[1, i] == 0)
 end
 
-# Bm needs to be updated later
-@variable(m, 0 <= Bm[1:NB] <= 1, Int)
+# Bm needs to be updated later Bm can be real number
+@variable(m, 0 <= Bm[1:NB] <= 1)
 #we assume the input data table has 5 boolean features
 @variable(m, Xi[1:NE, 1:NF])
 
