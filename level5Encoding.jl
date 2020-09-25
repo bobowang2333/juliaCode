@@ -7,11 +7,12 @@ m = Model(solver = GurobiSolver(NonConvex=2))
 #set_optimizer_attribute(m, "NonConvex", 2)
 
 # set macro, the size of outputClass, input features, .. etc.
-NE = 3; # number of examples
-NF = 5; # number of input features
+NE = 10; # number of examples
+NF = 3; # number of input features
 NO = 2; # number of output features
 #NL = 4; # number of leaves
 #NB = 3; # number of branches
+senID = 1; # ID of sensitive attribute
 
 # formalize the level
 #@variable(m, nlevel, Int)
@@ -29,10 +30,10 @@ NB = (2^nlevel)-1; # number of branches
 # assuming the number of classes is NO
 @variable(m, Lt[1:NL], Int)
 
-# bobo : In the one level setting, Am cannot be [0,0,0,..0] vector
+# bobo : In the one level setting,Am cannot be [0,0,0,..0] vector
 @variable(m, 0 <= dt[1:NB] <= 1, Int)
 #@variable(m, Ft[1:2])
-@variable(m, Nt[1:NL] >= 0, Int)
+@variable(m, Nt[1:NL] >= 0,Int)
 @variable(m, Nkt[1:NL, 1:NO], Int)
 # bobo : the range of Ckt should also be in [0,1]
 @variable(m, 0 <= Ckt[1:NL, 1:NO] <= 1, Int)
@@ -113,13 +114,17 @@ end
 
 # bobo  : we assume f1 represents the sensitive feature, which cannot be used to split examples
 #@constraint(m, Am[1, 1] == 0)
+
 @constraintref sensitiveFeature[1:NB]
 for i = 1:NB
-    sensitiveFeature[i] = @constraint(m, Am[1, i] == 0)
+    sensitiveFeature[i] = @constraint(m, Am[senID, i] == 0)
 end
+
 
 # Bm needs to be updated later Bm can be real number
 @variable(m, 0 <= Bm[1:NB] <= 1)
+
+#@constraint(m, Bm[1] == 0.5)
 #we assume the input data table has 5 boolean features
 @variable(m, Xi[1:NE, 1:NF])
 
@@ -134,8 +139,8 @@ end
 
 # epilson and epilson should be computed offline since the result only depdends on the input dataset which is already given.
 
-@constraint(m, epilsonDef[i=1:NF], epilson[i] == 1)
-@constraint(m, epilsonMax == 1)
+@constraint(m, epilsonDef[i=1:NF], epilson[i] == 0.01)
+@constraint(m, epilsonMax == 0.01)
 
 @constraint(m, XiPlusDef[i=1:NE, j=1:NF], XiPlus[i,j] == Xi[i,j] + epilson[j])
 @constraint(m, XiPlus * Am .== tmpRes2)
@@ -242,7 +247,7 @@ end
 
 # t represets branch here
 #@constraint(m, Bm[1:NB] .>= 0)
-@constraint(m, dtBmDef[i=1:NB], dt[i] == Bm[i])
+@constraint(m, dtBmDef[i=1:NB], dt[i] >= Bm[i])
 
 # now we only consider two levels, so we add constraint dt <= d_{p(t)}
 numNeed = (2^(nlevel-1))-1
@@ -251,7 +256,6 @@ for i = 1:numNeed
     levelDep[i,1] = @constraint(m, dt[i] >= dt[2*i])
     levelDep[i,2] = @constraint(m, dt[i] >= dt[2*i+1])
 end
-
 
 #=
 # now we only consider two levels, so we add constraint dt <= d_{p(t)}
@@ -314,7 +318,7 @@ end
 =#
 
 #read the input data from CSV file
-dataID = "Sub"
+dataID = "Quan"
 dataPath = "/Users/bobobo/Documents/fairSyn/juliaCode/readData/"
 
 Dataset = CSV.read(joinpath(Pkg.dir("DataFrames"), dataPath*"test$dataID.csv"))
@@ -414,7 +418,9 @@ end
 @variable(m, fair)
 @constraint(m, fair == sum(fairVar[t] for t = 1:NL) / NL)
 
-@objective(m, Min, sumLt + 0.2 * sumDt - fair)
+#@objective(m, Min, sumLt + 0.2 * sumDt - fair)
+
+@objective(m, Min, sumLt + 0.2 * sumDt)
 
 #@objective(m, Max, fair)
 

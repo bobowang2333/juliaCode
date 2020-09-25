@@ -19,7 +19,7 @@
 using namespace std;
 
 // path = "/Users/bobobo/Documents/fairSyn/juliaCode/"
-void writeJulia(string ID, string path, string ExpNum)
+void writeJulia(string ID, string path, string ExpNum, string senID)
 {
     ofstream juliaFile;
     juliaFile.open(path+"level.jl");
@@ -31,6 +31,8 @@ void writeJulia(string ID, string path, string ExpNum)
     juliaFile << "NE = " + ExpNum + "; # number of examples\n";
     juliaFile << "NF = 5; # number of input features\n";
     juliaFile << "NO = 2; # number of output features\n";
+    // bobo annotate the sensitive ID
+    juliaFile << "senID = " + senID + "; # ID of sensitive attribute\n";
     juliaFile << "\n";
     juliaFile << "# formalize the level\n";
     juliaFile << "nlevel = 2;\n";
@@ -83,11 +85,12 @@ void writeJulia(string ID, string path, string ExpNum)
     juliaFile << "# bobo  : we assume f1 represents the sensitive feature, which cannot be used to split examples\n";
     juliaFile << "@constraintref sensitiveFeature[1:NB]\n";
     juliaFile << "for i = 1:NB\n";
-    juliaFile << "\tsensitiveFeature[i] = @constraint(m, Am[1, i] == 0)\n";
+    juliaFile << "\tsensitiveFeature[i] = @constraint(m, Am[senID, i] == 0)\n";
     juliaFile << "end\n";
     juliaFile << "\n";
     juliaFile << "# Bm needs to be updated later\n";
-    juliaFile << "@variable(m, 0 <= Bm[1:NB] <= 1, Int)\n";
+    // bobo change the Bm not to be Int, in order to split the feature quantiatively
+    juliaFile << "@variable(m, 0 <= Bm[1:NB] <= 1)\n";
     juliaFile << "\n";
     juliaFile << "@variable(m, Xi[1:NE, 1:NF])\n";
     juliaFile << "@variable(m, tmpRes[1:NE, 1:NB])\n";
@@ -101,8 +104,9 @@ void writeJulia(string ID, string path, string ExpNum)
     juliaFile << "\n";
     juliaFile << "# epilson and epilson should be computed offline since the result only depdends on the input dataset which is already given.\n";
     juliaFile << "\n";
-    juliaFile << "@constraint(m, epilsonDef[i=1:NF], epilson[i] == 1)\n";
-    juliaFile << "@constraint(m, epilsonMax == 1)\n";
+    // bobo change the epilson value from 1 (boolean) to 0.01 (quantiatively)
+    juliaFile << "@constraint(m, epilsonDef[i=1:NF], epilson[i] == 0.01)\n";
+    juliaFile << "@constraint(m, epilsonMax == 0.01)\n";
     juliaFile << "\n";
     juliaFile << "@constraint(m, XiPlusDef[i=1:NE, j=1:NF], XiPlus[i,j] == Xi[i,j] + epilson[j])\n";
     juliaFile << "@constraint(m, XiPlus * Am .== tmpRes2)\n";
@@ -304,7 +308,8 @@ int main(int argc, const char * argv[]) {
     // argv[1]: the ID of CSV file, "1", "2", or "3" => "test0.csv"
     // argv[2]: the file path where the generated julia file will be stored
     // argv[3]: the number of examples in the csv file
-    writeJulia(argv[1], dataPath, argv[3]);
+    // argv[4]: the ID of sensitive attribute
+    writeJulia(argv[1], dataPath, argv[3], argv[4]);
     //dataPath = dataPath + argv[1];
     //dataPath += ".csv";
     cout << dataPath << endl;

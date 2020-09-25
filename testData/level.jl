@@ -5,9 +5,10 @@ using DataFrames, CSV
 m = Model(solver = GurobiSolver(NonConvex=2))
 
 # set macro, the size of outputClass, input features, .. etc.
-NE = 2; # number of examples
+NE = 10; # number of examples
 NF = 5; # number of input features
 NO = 2; # number of output features
+senID = 1; # ID of sensitive attribute
 
 # formalize the level
 nlevel = 2;
@@ -60,11 +61,11 @@ end
 # bobo  : we assume f1 represents the sensitive feature, which cannot be used to split examples
 @constraintref sensitiveFeature[1:NB]
 for i = 1:NB
-	sensitiveFeature[i] = @constraint(m, Am[1, i] == 0)
+	sensitiveFeature[i] = @constraint(m, Am[senID, i] == 0)
 end
 
 # Bm needs to be updated later
-@variable(m, 0 <= Bm[1:NB] <= 1, Int)
+@variable(m, 0 <= Bm[1:NB] <= 1)
 
 @variable(m, Xi[1:NE, 1:NF])
 @variable(m, tmpRes[1:NE, 1:NB])
@@ -78,8 +79,8 @@ end
 
 # epilson and epilson should be computed offline since the result only depdends on the input dataset which is already given.
 
-@constraint(m, epilsonDef[i=1:NF], epilson[i] == 1)
-@constraint(m, epilsonMax == 1)
+@constraint(m, epilsonDef[i=1:NF], epilson[i] == 0.01)
+@constraint(m, epilsonMax == 0.01)
 
 @constraint(m, XiPlusDef[i=1:NE, j=1:NF], XiPlus[i,j] == Xi[i,j] + epilson[j])
 @constraint(m, XiPlus * Am .== tmpRes2)
@@ -161,7 +162,7 @@ for i = 1:(2^nlevel-1)
 end
 
 #read the input data from CSV file
-dataID = "15"
+dataID = "0"
 dataPath = "/Users/bobobo/Documents/fairSyn/juliaCode/testData/"
 Dataset = CSV.read(joinpath(Pkg.dir("DataFrames"), dataPath*"test$dataID.csv"))
 # Data matrix without Dataset
