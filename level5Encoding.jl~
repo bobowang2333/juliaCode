@@ -12,7 +12,7 @@ NF = 3; # number of input features
 NO = 2; # number of output features
 #NL = 4; # number of leaves
 #NB = 3; # number of branches
-senID = 1;
+senID = 1; # ID of sensitive attribute
 
 # formalize the level
 #@variable(m, nlevel, Int)

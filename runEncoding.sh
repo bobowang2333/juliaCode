@@ -5,6 +5,9 @@ filename="User didnt specify the input dataset"
 runPath="/Users/bobobo/Documents/fairSyn/juliaCode/testData"
 juliaPath="/Applications/Julia-0.6.app/Contents/Resources/julia/bin"
 
+# need to modify for each Dataset
+senID=2
+
 # e.g. DatasetName = ("1", "2", ...) here we assume file name is "test0.csv", "test1.csv", which has been hard coded in genJulia.cpp 
 declare -a DatasetName=()
 # "1:0", "1" represents the ID for the root branch
@@ -36,7 +39,7 @@ do
     csvName="${runPath}/test${branch}.csv"
     # count the line number of CSV file
     lineNum=$(python ${runPath}/countCSV.py ${csvName})
-    ${runPath}/genJulia $branch ${runPath}/ $lineNum
+    ${runPath}/genJulia $branch ${runPath}/ $lineNum $senID
 
     # step2: run the julia script to get the feature ID "res.txt"
     # /Applications/Julia-0.6.app/Contents/Resources/julia/bin/julia /Users/bobobo/Documents/fairSyn/juliaCode/Encoding.jl
