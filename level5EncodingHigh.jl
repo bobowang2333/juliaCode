@@ -117,11 +117,12 @@ end
 #@constraint(m, Am[1, 1] == 0)
 
 #@constraintref sensitiveFeature[1:NB]
+#=
 sensitiveFeature = Vector{ConstraintRef}(undef, NB)
 for i = 1:NB
     sensitiveFeature[i] = @constraint(m, Am[senID, i] == 0)
 end
-
+=#
 
 # Bm needs to be updated later Bm can be real number
 @variable(m, 0 <= Bm[1:NB] <= 1)
@@ -330,9 +331,10 @@ end
 
 #read the input data from CSV file
 dataID = "Quan"
-dataPath = "/Users/bobobo/Documents/fairSyn/juliaCode/readData/"
+dataPath = "/Users/jingbow/Downloads/juliaCode/readData/"
 
-Dataset = CSV.read(joinpath(Pkg.dir("DataFrames"), dataPath*"test$dataID.csv"))
+#Dataset = CSV.read(joinpath(Pkg.dir("DataFrames"), dataPath*"test$dataID.csv"))
+Dataset = CSV.read(joinpath(dirname(pathof(DataFrames)), dataPath*"test$dataID.csv"))
 # Data matrix without Dataset
 mt = convert(Matrix, Dataset[:,1:NF])
 # Data matrix with output
@@ -352,7 +354,8 @@ output = convert(Vector, Dataset[:, (NF+1)])
 @variable(m, MPt[1:NE, 1:NL] >= 0, Int)
 @variable(m, Mt[1:NE, 1:NL] >= 0, Int)
 
-@constraintref FPt_cons[1:NE, 1:NL]
+#@constraintref FPt_cons[1:NE, 1:NL]
+FPt_cons = JuMP.Containers.DenseAxisArray{ConstraintRef}(undef, 1:NE, 1:NL)
 for i = 1:NE
     for j = 1:NL
         if(output[i] == 1 && mt[i,1] == 0)
@@ -363,7 +366,8 @@ for i = 1:NE
     end
 end
 
-@constraintref Ft_cons[1:NE, 1:NL]
+#@constraintref Ft_cons[1:NE, 1:NL]
+Ft_cons = JuMP.Containers.DenseAxisArray{ConstraintRef}(undef, 1:NE, 1:NL)
 for i = 1:NE
     for j = 1:NL 
         if(mt[i,1] == 0)
@@ -374,7 +378,8 @@ for i = 1:NE
     end
 end
 
-@constraintref MPt_cons[1:NE, 1:NL]
+#@constraintref MPt_cons[1:NE, 1:NL]
+MPt_cons = JuMP.Containers.DenseAxisArray{ConstraintRef}(undef, 1:NE, 1:NL)
 for i = 1:NE
     for j = 1:NL
         if(output[i] == 1 && mt[i,1] == 1)
@@ -385,7 +390,8 @@ for i = 1:NE
     end
 end
 
-@constraintref Mt_cons[1:NE, 1:NL]
+#@constraintref Mt_cons[1:NE, 1:NL]
+Mt_cons = JuMP.Containers.DenseAxisArray{ConstraintRef}(undef, 1:NE, 1:NL)
 for i = 1:NE
     for j = 1:NL
         if(mt[i,1] == 1)
@@ -438,7 +444,9 @@ end
 #@objective(m, Min, sumLt)
 #optimize!(m)
 
-solve(m)
+#solve(m)
+optimize!(m)
+
 #=
 # compute the infeasible constraints set if the solver outputs no result
 grb_model = m.internalModel.inner
@@ -448,7 +456,7 @@ iis_constrs = Gurobi.get_intattrarray(grb_model, "IISConstr",  1, num_constrs)
 m.linconstr[find(iis_constrs)]
 =#
 
-io = open("/Users/bobobo/Documents/fairSyn/juliaCode/res.txt", "w")
+io = open("/Users/jingbow/Downloads/juliaCode/res.txt", "w")
 choose = 0
 for i = 1:NF
     if getvalue(Am[i,1]) == 1
@@ -459,13 +467,13 @@ println(io, dataID)
 println(io, choose)
 close(io)
 
-println("Final Solution: [ sumDt : $(getvalue(sumDt))]")
-println("Final Solution: [ fairVar : $(getvalue(fairVar))]")
-println("Final Solution: [ fair : $(getvalue(fair))]")
-println("Final Solution: [ sumLt : $(getvalue(sumLt))]")
-println("Final Solution: [ Yik : $(getvalue(Yik))]")
-println("Final Solution: [ Nt : $(getvalue(Nt))]")
-println("Final Solution: [ Lt : $(getvalue(Lt))]")
-println("Final Solution: [ Zit : $(getvalue(Zit))]")
-println("Final Solution: [ Am : $(getvalue(Am))  ]")
-println("Final Solution: [ Bm : $(getvalue(Bm))  ]")
+println("Final Solution: [ sumDt : $(value(sumDt))]")
+println("Final Solution: [ fairVar : $(JuMP.value.(fairVar))]")
+println("Final Solution: [ fair : $(value(fair))]")
+println("Final Solution: [ sumLt : $(value(sumLt))]")
+println("Final Solution: [ Yik : $(JuMP.value.(Yik))]")
+println("Final Solution: [ Nt : $(JuMP.value.(Nt))]")
+println("Final Solution: [ Lt : $(JuMP.value.(Lt))]")
+println("Final Solution: [ Zit : $(JuMP.value.(Zit))]")
+println("Final Solution: [ Am : $(JuMP.value.(Am))  ]")
+println("Final Solution: [ Bm : $(JuMP.value.(Bm))  ]")
