@@ -1,0 +1,95 @@
+#!/bin/bash
+
+# Preprocess the data then output eihter boolean or quantiative dataset
+
+
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+
+case $key in
+    -f|--filename) # the input dataset file
+    fileName="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -c|--config) # the configuration file
+    config="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -s|--senID)
+    senID="$2"
+    shift
+    shift
+    ;;
+    -r|--runPath)
+    runPath="$2"
+    shift
+    shift
+    ;;
+    -j|--juliaPath)
+    juliaPath="$2"
+    shift
+    shift
+    ;;
+    -N|--FeatureNum)
+    FeatureNum="$2"
+    shift
+    shift
+    ;;
+    -n|--nlevel)
+    nlevel="$2"
+    shift
+    shift
+    ;;
+    -Q|--Quan)
+    Quan="$2"
+    shift
+    shift
+    ;;
+    --default)
+    DEFAULT=YES
+    shift # past argument
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+if [ ${Quan} != 0 ]; then
+    # output the quantiative dataset
+    python ./Dataset/transDataset.py ${fileName} ${config} ${senID} 1
+    mv ./boolean.data ${runPath}/boolean.data
+    # the output file name "boolean.data"
+    python ./Dataset/data2CSV.py ${runPath}/boolean.data  ${runPath}/test1.csv 1 ${runPath}/TEST.csv
+    # generate the CSV file and continue sampling
+
+    # run the iterative MIP encoding process we may also need to change the genJulia file
+    ./runEncodingHighNew.sh -f 1 -r ${runPath} -j ${juliaPath} -s ${senID} -n ${nlevel} -N ${FeatureNum}
+    # it will output the treeRes.txt in the runPath
+
+    # analyze the result and output the DTDI value 
+    python ./Dataset/readResQuan.py ${runPath}/treeRes.txt ${runPath}/test1.csv ${runPath}/TEST.csv ${runPath}/predict.CSV  1
+    python ./Dataset/getDTDI.py ${runPath}/predict.csv ${senID} 1
+else
+    #newSenID=${python ./Dataset/transDataset.py ${fileName} ${config} ${senID} 0}
+    python ./Dataset/transDataset.py ${fileName} ${config} ${senID} 0
+    newSenID=$(./Dataset/newSenID newSenID.txt 0)
+    FeatureNum=$(./Dataset/newSenID newSenID.txt 1)
+    FeatureNum=$(( FeatureNum - 1 ))
+    mv ./boolean.data ${runPath}/boolean.data
+    python ./Dataset/data2CSV.py ${runPath}/boolean.data  ${runPath}/test1.csv 1 ${runPath}/TEST.csv
+    
+    # TODO
+    ./runEncodingHighBoolean.sh -f 1 -r ${runPath} -j ${juliaPath} -s ${newSenID} -n ${nlevel} -N ${FeatureNum}
+ 
+    python ./Dataset/readResQuan.py ${runPath}/treeRes.txt ${runPath}/test1.csv ${runPath}/TEST.csv ${runPath}/predict.CSV  0
+    python ./Dataset/getDTDI.py ${runPath}/predict.csv ${newSenID} 1
+fi
+
+# TODO add the automatic run of CART algorithm

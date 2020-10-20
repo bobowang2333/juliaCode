@@ -319,7 +319,7 @@ end
 
 #read the input data from CSV file
 dataID = "Quan"
-dataPath = "/Users/bobobo/Documents/fairSyn/juliaCode/readData/"
+dataPath = "/Users/jingbow/Downloads/juliaCode/readData/"
 
 Dataset = CSV.read(joinpath(Pkg.dir("DataFrames"), dataPath*"test$dataID.csv"))
 # Data matrix without Dataset
