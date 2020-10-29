@@ -45,7 +45,7 @@ The format of configuration file: each line of the file corresponds to each feat
 Next, we will generate the CSV file (with header) and sample part of the datasets as our training set, where the input is <mark>"boolean.data"</mark>. 
 
 ```bash
-python ./Dataset/data2CSV.py boolean.data output_CSV sample_para
+python ./Dataset/data2CSV.py boolean.data output_CSV sample_para test_CSV
 ```
 
 In the above command, if sampl\_para is 0, which means that we do not sample the data and generate the origianl dataset in CSV form. Otherwise, if sample_para is 1, which would sample the data in 1/50 size. (50 is the current setting, and we can modify it later on)

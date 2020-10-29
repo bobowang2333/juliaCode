@@ -100,6 +100,12 @@ def toNum(F, counter):
 	newF = [(i-newF.min())/(newF.max() - newF.min()) for i in newF]
 	return newF
 
+def is_number(s):
+	try:
+		float(s)
+		return True
+	except ValueError:
+		return False
 
 def quantiative(dataArray):
 	dataT = [*zip(*dataArray)] 
@@ -113,12 +119,19 @@ def quantiative(dataArray):
 			attriN = boolVal(attri)
 			newData.append(attriN)
 		else:
+			print("value : " + attri[0])
+			if is_number(attri[0]) or attri[0].isdigit():
 			#numerical value, convert the original list to NP matrix
-			attriN = np.zeros((len(attri), 1))
-			for i in range(len(attri)):
-				attriN[i,0] = attri[i]
-			attriN = [(i-attriN.min())/(attriN.max()-attriN.min()) for i in attriN]
-			newData.append(attriN)
+				print("Handle Numerical Value\n")
+				attriN = np.zeros((len(attri), 1))
+				for i in range(len(attri)):
+					attriN[i,0] = attri[i]
+				attriN = [(i-attriN.min())/(attriN.max()-attriN.min()) for i in attriN]
+				newData.append(attriN)
+			else:
+				print("Handle non-numerical value\n")
+				attriN = toNum(attri, Counter(attri))
+				newData.append(attriN)
 	newData = genNpMatrix(newData)	
 	return newData		
 
@@ -168,7 +181,7 @@ def saveCSV(dataArray, para):
 	if para == 0:
 		np.savetxt("boolean.data", dataArray.astype(int), fmt='%i', delimiter=" ")
 	else:
-		np.savetxt("boolean.data", dataArray.astype(float), fmt='%.6f', delimiter=" ")
+		np.savetxt("quantiative.data", dataArray.astype(float), fmt='%.6f', delimiter=" ")
 
 
 if __name__ == "__main__":
@@ -176,9 +189,9 @@ if __name__ == "__main__":
 		print('Please input the data file (.CSV or .data), the configuration file, sensitive attribute index (starts from 0), para (0: generate boolean file, 1: generate quantiative file)')
 		sys.exit()
 	data = readData(str(sys.argv[1]))
-	dataDict = readConfig(sys.argv[2])
 	para = int(sys.argv[4])
 	if para == 0:
+		dataDict = readConfig(sys.argv[2])
 		newArray = booleanize(data, dataDict, int(sys.argv[3]))
 	else:
 		newArray = quantiative(data)
