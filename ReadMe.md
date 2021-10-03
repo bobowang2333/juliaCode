@@ -29,7 +29,7 @@ Here we document all the running instructions to learn a fair decision tree by i
 The input datasets are pretty arbitrary, the value may range over boolean, real, categorical domains. We will transform the original dataset to the boolean dataset and present two different processing approaches. First, for the categorical value, we adopt the one-hot encoding to generate multiple boolean columns for the replacement. Second, for the read-valued features, we require user to specify the config file denoting the range to split for each continuous-valued features.
 
 ```bash
-python ./Dataset/transDataset.py original_dataset configuration_file sensitive_index 0
+python ./Dataset/transDataset.py original_dataset configuration_file sensitive_index 0 thres
 ```
 
 After executing the above command, it will output the booleanized dataset in the name <mark>"boolean.data"</mark>. The following shows one example of the configuration file (in [Germany](https://archive.ics.uci.edu/ml/datasets/Statlog+(German+Credit+Data)) Dataset):
