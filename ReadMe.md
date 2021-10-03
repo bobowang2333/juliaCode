@@ -1,8 +1,8 @@
-#README
+# README
 
 We implemented the Overhead-aware Learning for Fair and Approximate Optimal Decision Tree Classifier, which is encoded in Julia 1.5.1 along with the Gurobi Solver 9.03. 
 
-##Installation
+## Installation
 First download and install [Julia](https://julialang.org/downloads/) and open the Julia notebook. From Julia, [JuMP](https://jump.dev/JuMP.jl/v0.21.1/installation/) is installed by built-in package manager.
 
 ```bash
